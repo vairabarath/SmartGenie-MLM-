@@ -242,19 +242,10 @@ const Register: React.FC = () => {
     }
   };
 
-  const feeBreakdown = [
-    { label: "Referrer (10%)", amount: "0.0000005 BNB" },
-    { label: "Promotion Wallets (9%)", amount: "0.00000045 BNB" },
-    { label: "↳ Promotion Wallet 1 (60%)", amount: "0.00000027 BNB" },
-    { label: "↳ Promotion Wallet 2 (40%)", amount: "0.00000018 BNB" },
-    { label: "Special Promotion Wallet (1%)", amount: "0.00000005 BNB" },
-    { label: "Level 1 (80%)", amount: "0.000004 BNB" },
-  ];
-
   return (
-    <div className="min-h-screen bg-gray-900 p-4">
+    <div className="min-h-screen bg-gray-900 p-4 ">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 overflow-hidden">
+        <div className="bg-gray-800 rounded-xl shadow-2xl border mt-28 border-gray-700 overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-center">
             <div className="flex justify-center mb-4">
@@ -345,25 +336,7 @@ const Register: React.FC = () => {
               <div className="flex items-center mb-3">
                 <Wallet className="w-5 h-5 text-blue-500 mr-2" />
                 <span className="text-gray-300">Registration Fee:</span>
-                <span className="text-white font-bold ml-2">
-                  0.000005 BNB (Test)
-                </span>
-              </div>
-
-              <div className="text-sm text-gray-400">
-                <p className="mb-2 font-medium">Fee Distribution Breakdown:</p>
-                <div className="space-y-1">
-                  {feeBreakdown.map((item, index) => (
-                    <div key={index} className="flex justify-between">
-                      <span
-                        className={item.label.startsWith("↳") ? "pl-4" : ""}
-                      >
-                        {item.label}
-                      </span>
-                      <span>{item.amount}</span>
-                    </div>
-                  ))}
-                </div>
+                <span className="text-white font-bold ml-2">0.01 BNB</span>
               </div>
             </div>
 

@@ -16,30 +16,26 @@ const Session: React.FC = () => {
     checkUserRegistration,
     loginUser,
     contract,
-    web3,
     walletProvider,
     setWalletProvider,
+    OPBNB_MAINNET_CHAIN_ID,
+    OPBNB_MAINNET_HEX,
+    OPBNB_MAINNET_NAME,
   } = useWeb3();
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("WalletProvider:", walletProvider, "Account:", account);
     if (walletProvider && !account) {
       initializeConnection();
     } else if (account) {
       setWalletAddress(account);
       checkNetwork();
-      // Only fetch user list if contract is initialized
-      if (contract) {
-        fetchUserList();
-      }
     }
 
     const storedAccount = localStorage.getItem("currentAccount");
     const storedWalletRdns = localStorage.getItem("selectedWalletRdns");
 
     if (storedAccount && storedWalletRdns && !walletProvider) {
-      console.log("Attempting to restore wallet connection for session page");
       restoreWalletConnection(storedWalletRdns);
     }
   }, [walletProvider, account, contract]);
@@ -62,11 +58,8 @@ const Session: React.FC = () => {
 
         const networkNames = {
           1: "Ethereum Mainnet",
-          5: "Goerli Testnet",
           56: "BSC Mainnet",
-          97: "BSC Testnet",
-          204: "opBNB Mainnet",
-          5611: "opBNB Testnet",
+          204: OPBNB_MAINNET_NAME,
         };
 
         setCurrentNetwork(
@@ -74,92 +67,13 @@ const Session: React.FC = () => {
             `Unknown (${chainIdDecimal})`
         );
 
-        if (![204, 5611].includes(chainIdDecimal)) {
+        if (chainIdDecimal !== OPBNB_MAINNET_CHAIN_ID) {
           console.warn("⚠️ Not on opBNB network. Current:", chainIdDecimal);
-          toast.warning(
-            "Please switch to opBNB network for full functionality"
-          );
+          toast.warning(`Please switch to ${OPBNB_MAINNET_NAME}`);
         }
       } catch (error) {
         console.error("Failed to check network:", error);
       }
-    }
-  };
-
-  const fetchUserList = async () => {
-    try {
-      if (!contract || !web3) {
-        console.error("Contract or Web3 not initialized");
-        // Don't show toast error immediately - wait for initialization
-        return;
-      }
-
-      // First, verify contract exists
-      const contractCode = await web3.eth.getCode(contract.options.address);
-      if (contractCode === "0x") {
-        console.error(
-          "No contract found at address:",
-          contract.options.address
-        );
-        toast.error("Contract not found at specified address");
-        return;
-      }
-
-      console.log("✅ Contract exists, fetching user list...");
-
-      // Get current user ID with proper error handling
-      let currUserID;
-      try {
-        currUserID = await contract.methods.currUserID().call();
-        console.log("Current User ID:", currUserID.toString());
-      } catch (error) {
-        console.error("Failed to get currUserID:", error);
-        toast.error("Failed to query contract - check network connection");
-        return;
-      }
-
-      const userIDNumber = Number(currUserID.toString());
-      if (userIDNumber <= 1) {
-        console.log("No users registered yet or only owner exists");
-        return;
-      }
-
-      const entries = [];
-      for (let i = 1; i <= userIDNumber; i++) {
-        try {
-          const userAddress = await contract.methods.userList(i).call();
-          if (
-            userAddress &&
-            userAddress !== "0x0000000000000000000000000000000000000000"
-          ) {
-            entries.push({ id: i, address: userAddress });
-          }
-        } catch (err) {
-          console.warn(
-            `Failed to fetch userList for ID ${i}:`,
-            err instanceof Error ? err.message : String(err)
-          );
-          // Continue with next ID instead of breaking
-        }
-      }
-
-      console.log("User List:", entries);
-
-      // Log user list for debugging purposes
-      if (entries.length > 0) {
-        console.log(
-          `✅ Successfully fetched ${entries.length} users from userList`
-        );
-      } else {
-        console.log("ℹ️ No valid users found in userList");
-      }
-    } catch (error) {
-      console.error("Error fetching userList:", error);
-      toast.error(
-        `Failed to fetch user list: ${
-          error instanceof Error ? error.message : String(error)
-        }`
-      );
     }
   };
 
@@ -168,7 +82,6 @@ const Session: React.FC = () => {
       const connected = await connectWallet();
       if (connected && account) {
         setWalletAddress(account);
-        fetchUserList();
       }
     } catch (error) {
       console.error("Failed to initialize connection:", error);
@@ -197,12 +110,10 @@ const Session: React.FC = () => {
         cancelButtonColor: "#6b7280",
       });
       if (result.isConfirmed) {
-        fetchUserList();
         const isRegistered = await checkUserRegistration(account);
         if (isRegistered) {
           const loginSuccess = await loginUser();
           if (loginSuccess) {
-            toast.success("Login successful!");
             navigate("/dashboard");
           } else {
             toast.error("Login failed");
@@ -243,7 +154,6 @@ const Session: React.FC = () => {
       if (provider) {
         setWalletProvider(provider);
         console.log("Wallet provider restored for session");
-        fetchUserList();
       }
     } catch (error) {
       console.error("Failed to restore wallet connection:", error);
@@ -335,7 +245,7 @@ const Session: React.FC = () => {
                 <p className="text-sm text-gray-300 mb-1">Current Network:</p>
                 <p
                   className={`text-sm font-mono ${
-                    [204, 5611].includes(networkId)
+                    networkId === OPBNB_MAINNET_CHAIN_ID
                       ? "text-green-400"
                       : "text-red-400"
                   }`}
@@ -346,16 +256,16 @@ const Session: React.FC = () => {
             )}
 
             {/* Network Switch Buttons - only show if not on opBNB */}
-            {![204, 5611].includes(networkId) && (
+            {networkId !== OPBNB_MAINNET_CHAIN_ID && (
               <div className="space-y-2">
                 <button
                   onClick={async () => {
                     try {
                       await window.ethereum.request({
                         method: "wallet_switchEthereumChain",
-                        params: [{ chainId: "0x15EB" }], // 5611 in hex for opBNB testnet
+                        params: [{ chainId: OPBNB_MAINNET_HEX }], // 5611 in hex for opBNB testnet
                       });
-                      toast.success("Switched to opBNB testnet");
+                      toast.success(`Switched to ${OPBNB_MAINNET_NAME}`);
                       checkNetwork();
                     } catch (error: any) {
                       if (error.code === 4902) {
@@ -365,54 +275,8 @@ const Session: React.FC = () => {
                             method: "wallet_addEthereumChain",
                             params: [
                               {
-                                chainId: "0x15EB",
-                                chainName: "opBNB Testnet",
-                                nativeCurrency: {
-                                  name: "BNB",
-                                  symbol: "BNB",
-                                  decimals: 18,
-                                },
-                                rpcUrls: [
-                                  "https://opbnb-testnet-rpc.bnbchain.org",
-                                ],
-                                blockExplorerUrls: ["https://opbnbscan.com"],
-                              },
-                            ],
-                          });
-                          toast.success("opBNB Testnet added and switched");
-                          checkNetwork();
-                        } catch (addError) {
-                          toast.error("Failed to add opBNB testnet");
-                        }
-                      } else {
-                        toast.error("Failed to switch network");
-                      }
-                    }
-                  }}
-                  className="w-full flex items-center justify-center py-2 px-4 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-lg transition-all duration-200"
-                >
-                  🌐 Switch to opBNB Testnet
-                </button>
-
-                <button
-                  onClick={async () => {
-                    try {
-                      await window.ethereum.request({
-                        method: "wallet_switchEthereumChain",
-                        params: [{ chainId: "0xCC" }], // 204 in hex for opBNB mainnet
-                      });
-                      toast.success("Switched to opBNB mainnet");
-                      checkNetwork();
-                    } catch (error: any) {
-                      if (error.code === 4902) {
-                        // Network not added, try to add it
-                        try {
-                          await window.ethereum.request({
-                            method: "wallet_addEthereumChain",
-                            params: [
-                              {
-                                chainId: "0xCC",
-                                chainName: "opBNB Mainnet",
+                                chainId: OPBNB_MAINNET_HEX,
+                                chainName: OPBNB_MAINNET_NAME,
                                 nativeCurrency: {
                                   name: "BNB",
                                   symbol: "BNB",
@@ -425,19 +289,21 @@ const Session: React.FC = () => {
                               },
                             ],
                           });
-                          toast.success("opBNB Mainnet added and switched");
+                          toast.success(
+                            `${OPBNB_MAINNET_NAME} added and switched`
+                          );
                           checkNetwork();
                         } catch (addError) {
-                          toast.error("Failed to add opBNB mainnet");
+                          toast.error(`Failed to add ${OPBNB_MAINNET_NAME}`);
                         }
                       } else {
                         toast.error("Failed to switch network");
                       }
                     }
                   }}
-                  className="w-full flex items-center justify-center py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-all duration-200"
+                  className="w-full flex items-center justify-center py-2 px-4 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-lg transition-all duration-200"
                 >
-                  🌐 Switch to opBNB Mainnet
+                  🌐 Switch to {OPBNB_MAINNET_NAME}
                 </button>
               </div>
             )}
@@ -448,33 +314,6 @@ const Session: React.FC = () => {
             <p className="text-gray-400">Connecting to wallet...</p>
           </div>
         )}
-        {/* {walletAddress && (
-          <div className="mt-6 p-3 bg-gray-700/30 rounded-lg">
-            <div className="flex items-center text-sm text-gray-300">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-              Wallet connected successfully
-            </div>
-          </div>
-        )} */}
-
-        {/* Contract Status Indicator */}
-        {/* {walletAddress && (
-          <div className="mt-6 p-3 bg-gray-700/30 rounded-lg">
-            <div className="flex items-center text-sm text-gray-300">
-              {contract ? (
-                <>
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                  Smart contract connected
-                </>
-              ) : (
-                <>
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
-                  Contract initializing...
-                </>
-              )}
-            </div>
-          </div>
-        )} */}
       </div>
     </div>
   );

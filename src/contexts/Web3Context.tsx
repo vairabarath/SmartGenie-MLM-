@@ -51,6 +51,9 @@ interface Web3ContextType {
   account: string | null;
   isConnected: boolean;
   contract: any;
+  OPBNB_MAINNET_CHAIN_ID: number;
+  OPBNB_MAINNET_HEX: string;
+  OPBNB_MAINNET_NAME: string;
   connectWallet: () => Promise<boolean>;
   checkUserRegistration: (address: string) => Promise<boolean>;
   registerUser: (referralId: string) => Promise<boolean>;
@@ -84,7 +87,9 @@ interface Web3ProviderProps {
 export const Web3Context = createContext<Web3ContextType | null>(null);
 
 const CONTRACT_ADDRESS = "0x6b9c86c809321ba5e4ef4d96f793e45f34828e62";
-const REQUIRED_CHAIN_IDS = [204, 5611]; // opBNB mainnet and testnet
+const OPBNB_MAINNET_CHAIN_ID = 204;
+const OPBNB_MAINNET_HEX = "0xCC";
+const OPBNB_MAINNET_NAME = "opBNB Mainnet";
 
 export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
   const [web3, setWeb3] = useState<Web3 | null>(null);
@@ -99,20 +104,13 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       const savedAccount = localStorage.getItem("currentAccount");
       const savedWalletRdns = localStorage.getItem("selectedWalletRdns");
 
-      console.log("Web3Context: Checking stored data", {
-        savedAccount,
-        savedWalletRdns,
-      });
-
       if (savedAccount && savedWalletRdns) {
         setAccount(savedAccount);
-        console.log("Web3Context: Account restored from storage");
 
         // Try to restore the wallet provider
         try {
           const provider = await waitForWalletProvider(savedWalletRdns);
           if (provider) {
-            console.log("Web3Context: Wallet provider restored");
             setWalletProvider(provider);
             // The wallet provider will be set, and then initializeWeb3 will be called via useEffect
           } else {
@@ -133,7 +131,6 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
   // Add useEffect to initialize Web3 when walletProvider is set
   useEffect(() => {
     if (walletProvider && account) {
-      console.log("Web3Context: walletProvider changed, initializing Web3");
       initializeWeb3();
     }
   }, [walletProvider, account]);
@@ -193,7 +190,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
 
   const handleChainChanged = async (chainId: string) => {
     const currentChainId = parseInt(chainId, 16);
-    if (!REQUIRED_CHAIN_IDS.includes(currentChainId)) {
+    if (currentChainId !== OPBNB_MAINNET_CHAIN_ID) {
       const result = await Swal.fire({
         title: "Wrong Network",
         text: "Please switch to opBNB network to continue",
@@ -210,19 +207,40 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       }
     }
   };
-
   const switchToOpBNB = async () => {
     try {
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0x15EB" }], // 5611 in hex for testnet
+        params: [{ chainId: "0xCC" }], // 204 in hex for opBNB mainnet
       });
       return true;
     } catch (error: any) {
       if (error.code === 4902) {
-        toast.error("opBNB network not found in wallet");
+        try {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainId: "0xCC",
+                chainName: "opBNB Mainnet",
+                nativeCurrency: {
+                  name: "BNB",
+                  symbol: "BNB",
+                  decimals: 18,
+                },
+                rpcUrls: ["https://opbnb-mainnet-rpc.bnbchain.org"],
+                blockExplorerUrls: ["https://opbnbscan.com"],
+              },
+            ],
+          });
+          return true;
+        } catch (addError) {
+          toast.error("Failed to add opBNB Mainnet");
+          return false;
+        }
       } else {
         toast.error("Failed to switch network");
+        return false;
       }
     }
   };
@@ -232,7 +250,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       const web3Instance = new Web3(provider);
       const chainId = await web3Instance.eth.getChainId();
 
-      if (!REQUIRED_CHAIN_IDS.includes(Number(chainId))) {
+      if (Number(chainId) !== OPBNB_MAINNET_CHAIN_ID) {
         toast.error("Please switch to opBNB network");
         return false;
       }
@@ -267,7 +285,6 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
         }
 
         setContract(contractInstance);
-        console.log("contract initialized:", contractInstance);
         return true;
       } catch (contractError) {
         console.error("Contract initialization failed:", contractError);
@@ -285,10 +302,8 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     console.log("Initializing Web3 with walletProvider:", walletProvider);
     if (walletProvider) {
       const success = await checkNetworkAndInitialize(walletProvider);
-      console.log("Network initialization success:", success);
       if (success) {
         setIsConnected(true);
-        console.log("Web3 initialized successfully");
       } else {
         console.error("Web3 initialization failed");
       }
@@ -304,13 +319,10 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
         return false;
       }
 
-      console.log("Connecting wallet...");
-
       // First check if already connected
       let accounts;
       try {
         accounts = await walletProvider.request({ method: "eth_accounts" });
-        console.log("Existing accounts:", accounts);
       } catch (error) {
         console.log("No existing accounts, will request access");
         accounts = [];
@@ -322,8 +334,6 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
           method: "eth_requestAccounts",
         });
       }
-
-      console.log("Accounts received:", accounts);
 
       if (accounts.length > 0) {
         setAccount(accounts[0]);
@@ -367,8 +377,6 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
         console.error("No address provided");
         return false;
       }
-
-      console.log(`Checking registration for address: ${address}`);
 
       const userData = await contract.methods.users(address).call();
       console.log("User data:", userData);
@@ -769,6 +777,9 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     account,
     isConnected,
     contract,
+    OPBNB_MAINNET_CHAIN_ID,
+    OPBNB_MAINNET_HEX,
+    OPBNB_MAINNET_NAME,
     connectWallet,
     checkUserRegistration,
     registerUser,

@@ -2,7 +2,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import type { MenuItemType } from "../../types";
-import { User, TrendingUp, DollarSign, GitBranch, LogOut } from "lucide-react";
+import { User, TrendingUp, DollarSign, GitBranch } from "lucide-react";
 
 const Sidebar: React.FC = () => {
   const menuItems: MenuItemType[] = [
@@ -54,10 +54,6 @@ const Sidebar: React.FC = () => {
             </NavLink>
           );
         })}
-        <div className="flex items-center space-x-2 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-700 cursor-pointer">
-          <LogOut className="w-4 h-5" />
-          <span>Exit</span>
-        </div>
       </nav>
     </div>
   );

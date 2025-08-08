@@ -78,8 +78,8 @@ export const generateReferralURL = (
 ): string => {
   const baseURL = window.location.origin;
   const params = new URLSearchParams();
-
   params.set("ref", userId.toString());
+
   if (userCode) {
     params.set("code", userCode);
   }
@@ -123,7 +123,9 @@ export const cleanURLParameters = (): void => {
 export const setupReferralCleanup = (): void => {
   // SessionStorage naturally persists during page refresh but clears when tab is closed
   // We don't need aggressive cleanup listeners that might interfere with normal usage
-  
+
   // Only clear referral data after successful registration to prevent reuse
-  console.log('Referral cleanup initialized - sessionStorage will auto-clear on tab close');
+  console.log(
+    "Referral cleanup initialized - sessionStorage will auto-clear on tab close"
+  );
 };

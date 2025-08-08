@@ -44,8 +44,6 @@ interface GenealogyNode {
   referrals?: GenealogyNode[];
 }
 
-// MLMData interface removed as it's not used in this context
-
 interface Web3ContextType {
   web3: Web3 | null;
   account: string | null;
@@ -77,7 +75,7 @@ interface Web3ContextType {
     dirRefIncome: number;
   } | null>;
   extractReferralId: (url: string) => Promise<string | null>;
-  unixToIndianDate: (timestamp: number) => string;
+  unixToIndianDate: (timestamp: number | string | bigint) => string;
 }
 
 interface Web3ProviderProps {
@@ -120,9 +118,6 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
           console.error("Web3Context: Error restoring wallet provider:", error);
         }
       }
-
-      // Listen for wallet events
-      setupWalletListeners();
     };
 
     initializeFromStorage();
@@ -132,8 +127,23 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
   useEffect(() => {
     if (walletProvider && account) {
       initializeWeb3();
+      setupWalletListeners(); // Set up listeners when provider is available
     }
   }, [walletProvider, account]);
+
+  // Clean up old listeners when wallet provider changes
+  useEffect(() => {
+    return () => {
+      if (walletProvider) {
+        try {
+          walletProvider.removeAllListeners?.("accountsChanged");
+          walletProvider.removeAllListeners?.("chainChanged");
+        } catch (error) {
+          console.log("Error removing listeners:", error);
+        }
+      }
+    };
+  }, [walletProvider]);
 
   const waitForWalletProvider = (rdns: string): Promise<any> => {
     return new Promise((resolve) => {
@@ -168,9 +178,19 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
   };
 
   const setupWalletListeners = () => {
-    if (typeof window !== "undefined" && window.ethereum) {
-      window.ethereum.on("accountsChanged", handleAccountsChanged);
-      window.ethereum.on("chainChanged", handleChainChanged);
+    // FIXED: Use walletProvider instead of window.ethereum for multi-wallet support
+    if (walletProvider) {
+      // Remove existing listeners first to avoid duplicates
+      try {
+        walletProvider.removeAllListeners?.("accountsChanged");
+        walletProvider.removeAllListeners?.("chainChanged");
+      } catch (error) {
+        console.log("No existing listeners to remove");
+      }
+
+      // Add new listeners
+      walletProvider.on("accountsChanged", handleAccountsChanged);
+      walletProvider.on("chainChanged", handleChainChanged);
     }
   };
 
@@ -207,9 +227,17 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       }
     }
   };
+
   const switchToOpBNB = async () => {
     try {
-      await window.ethereum.request({
+      // FIXED: Use walletProvider instead of window.ethereum
+      const provider = walletProvider || window.ethereum;
+      if (!provider) {
+        toast.error("No wallet provider available");
+        return false;
+      }
+
+      await provider.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: "0xCC" }], // 204 in hex for opBNB mainnet
       });
@@ -217,7 +245,8 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     } catch (error: any) {
       if (error.code === 4902) {
         try {
-          await window.ethereum.request({
+          const provider = walletProvider || window.ethereum;
+          await provider.request({
             method: "wallet_addEthereumChain",
             params: [
               {
@@ -462,6 +491,16 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
+    // Clean up listeners before logout
+    if (walletProvider) {
+      try {
+        walletProvider.removeAllListeners?.("accountsChanged");
+        walletProvider.removeAllListeners?.("chainChanged");
+      } catch (error) {
+        console.log("Error cleaning up listeners during logout:", error);
+      }
+    }
+
     setWeb3(null);
     setAccount(null);
     setIsConnected(false);
@@ -476,10 +515,12 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       if (!contract || !account) return null;
 
       const userData = await contract.methods.users(account).call();
+
+      const timestamp = Number(userData.joined);
       return {
         userId: Number(userData.id),
         refId: Number(userData.referrerID),
-        doj: unixToIndianDate(userData.joined),
+        doj: unixToIndianDate(timestamp),
       };
     } catch (error) {
       console.error("Error fetching personal data:", error);
@@ -755,8 +796,24 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     }
   };
 
-  const unixToIndianDate = (unixTimestamp: number): string => {
-    const date = new Date(unixTimestamp * 1000);
+  const unixToIndianDate = (
+    unixTimestamp: number | string | bigint
+  ): string => {
+    // Handle different types of input (number, string, or bigint)
+    const timestamp =
+      typeof unixTimestamp === "bigint"
+        ? Number(unixTimestamp)
+        : typeof unixTimestamp === "string"
+        ? parseInt(unixTimestamp, 10)
+        : unixTimestamp;
+
+    // Ensure we have a valid number
+    if (isNaN(timestamp)) {
+      console.error("Invalid timestamp:", unixTimestamp);
+      return "Invalid date";
+    }
+
+    const date = new Date(timestamp * 1000);
 
     const options: Intl.DateTimeFormatOptions = {
       day: "2-digit",

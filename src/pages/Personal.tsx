@@ -87,7 +87,9 @@ const Personal: React.FC = () => {
             </div>
             <div>
               <p className="text-gray-400 text-sm mb-1">Join Date</p>
-              <p className="text-white font-medium">{data.personal.doj}</p>
+              <p className="text-white font-medium">
+                {data.personal.doj ?? "N/A"}
+              </p>
             </div>
           </div>
         </div>
@@ -150,15 +152,19 @@ const Personal: React.FC = () => {
         <div className="bg-slate-700 rounded-xl p-6 shadow-lg">
           <div className="flex items-center space-x-3 mb-6">
             <DollarSign className="text-green-400" size={24} />
-            <h3 className="text-xl font-semibold text-white">Earnings Overview</h3>
+            <h3 className="text-xl font-semibold text-white">
+              Earnings Overview
+            </h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-slate-800 rounded-lg p-4 hover:bg-slate-750 transition-colors">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm mb-1">Direct Referral Income</p>
-                  <BNBValue 
-                    bnbAmount={data.income.dirRefInc} 
+                  <p className="text-gray-400 text-sm mb-1">
+                    Direct Referral Income
+                  </p>
+                  <BNBValue
+                    bnbAmount={data.income.dirRefInc}
                     bnbClassName="text-green-400 font-semibold"
                     decimals={4}
                   />
@@ -169,8 +175,8 @@ const Personal: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm mb-1">Total Earnings</p>
-                  <BNBValue 
-                    bnbAmount={data.income.totalInc} 
+                  <BNBValue
+                    bnbAmount={data.income.totalInc}
                     bnbClassName="text-green-400 font-semibold text-lg"
                     decimals={4}
                   />

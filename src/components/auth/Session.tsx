@@ -19,7 +19,6 @@ const Session: React.FC = () => {
     walletProvider,
     setWalletProvider,
     OPBNB_MAINNET_CHAIN_ID,
-    OPBNB_MAINNET_HEX,
     OPBNB_MAINNET_NAME,
   } = useWeb3();
   const navigate = useNavigate();
@@ -48,7 +47,35 @@ const Session: React.FC = () => {
   }, [account]);
 
   const checkNetwork = async () => {
-    if (typeof window.ethereum !== "undefined") {
+    // FIXED: Use walletProvider instead of window.ethereum for multi-wallet support
+    if (walletProvider) {
+      try {
+        const chainId = await walletProvider.request({
+          method: "eth_chainId",
+        });
+        const chainIdDecimal = parseInt(chainId, 16);
+        setNetworkId(chainIdDecimal);
+
+        const networkNames = {
+          1: "Ethereum Mainnet",
+          56: "BSC Mainnet",
+          204: OPBNB_MAINNET_NAME,
+        };
+
+        setCurrentNetwork(
+          networkNames[chainIdDecimal as keyof typeof networkNames] ||
+            `Unknown (${chainIdDecimal})`
+        );
+
+        if (chainIdDecimal !== OPBNB_MAINNET_CHAIN_ID) {
+          console.warn("⚠️ Not on opBNB network. Current:", chainIdDecimal);
+          toast.warning(`Please switch to ${OPBNB_MAINNET_NAME}`);
+        }
+      } catch (error) {
+        console.error("Failed to check network:", error);
+      }
+    } else if (typeof window.ethereum !== "undefined") {
+      // Fallback to window.ethereum for backwards compatibility
       try {
         const chainId = await window.ethereum.request({
           method: "eth_chainId",
@@ -252,59 +279,6 @@ const Session: React.FC = () => {
                 >
                   {currentNetwork}
                 </p>
-              </div>
-            )}
-
-            {/* Network Switch Buttons - only show if not on opBNB */}
-            {networkId !== OPBNB_MAINNET_CHAIN_ID && (
-              <div className="space-y-2">
-                <button
-                  onClick={async () => {
-                    try {
-                      await window.ethereum.request({
-                        method: "wallet_switchEthereumChain",
-                        params: [{ chainId: OPBNB_MAINNET_HEX }], // 5611 in hex for opBNB testnet
-                      });
-                      toast.success(`Switched to ${OPBNB_MAINNET_NAME}`);
-                      checkNetwork();
-                    } catch (error: any) {
-                      if (error.code === 4902) {
-                        // Network not added, try to add it
-                        try {
-                          await window.ethereum.request({
-                            method: "wallet_addEthereumChain",
-                            params: [
-                              {
-                                chainId: OPBNB_MAINNET_HEX,
-                                chainName: OPBNB_MAINNET_NAME,
-                                nativeCurrency: {
-                                  name: "BNB",
-                                  symbol: "BNB",
-                                  decimals: 18,
-                                },
-                                rpcUrls: [
-                                  "https://opbnb-mainnet-rpc.bnbchain.org",
-                                ],
-                                blockExplorerUrls: ["https://opbnbscan.com"],
-                              },
-                            ],
-                          });
-                          toast.success(
-                            `${OPBNB_MAINNET_NAME} added and switched`
-                          );
-                          checkNetwork();
-                        } catch (addError) {
-                          toast.error(`Failed to add ${OPBNB_MAINNET_NAME}`);
-                        }
-                      } else {
-                        toast.error("Failed to switch network");
-                      }
-                    }
-                  }}
-                  className="w-full flex items-center justify-center py-2 px-4 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-lg transition-all duration-200"
-                >
-                  🌐 Switch to {OPBNB_MAINNET_NAME}
-                </button>
               </div>
             )}
           </div>

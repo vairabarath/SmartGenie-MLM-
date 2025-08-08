@@ -52,7 +52,7 @@ const WalletConnectionChecker: React.FC<WalletConnectionCheckerProps> = ({
 
             // Try to get current accounts to verify connection
             try {
-              await new Promise((resolve) => setTimeout(resolve, 200)); //for prevent race conditions
+              await new Promise((resolve) => setTimeout(resolve, 200)); // Prevent race conditions
 
               const accounts = await provider.request({
                 method: "eth_accounts",

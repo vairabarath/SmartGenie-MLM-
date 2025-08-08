@@ -139,6 +139,8 @@ const MultiWallet: React.FC = () => {
       }
 
       if (accounts && accounts.length > 0) {
+        // Store the account for future restoration
+        localStorage.setItem("currentAccount", accounts[0]);
         toast.success(`Connected to ${selectedWallet.name}`);
         // Add small delay before navigation
         await new Promise((resolve) => setTimeout(resolve, 500));
@@ -163,6 +165,10 @@ const MultiWallet: React.FC = () => {
       } else {
         toast.error("Failed to connect wallet. Please try again.");
       }
+
+      // Clean up on error
+      localStorage.removeItem("selectedWalletRdns");
+      localStorage.removeItem("currentAccount");
     } finally {
       setIsConnecting(false);
     }

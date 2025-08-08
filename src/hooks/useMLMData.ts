@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useWeb3 } from './useWeb3';
+import { useState, useEffect } from "react";
+import { useWeb3 } from "./useWeb3";
 
 interface PersonalData {
   userId: number;
@@ -46,15 +46,15 @@ export const useMLMData = () => {
     team: null,
     levels: [],
     income: null,
-    genealogy: null
+    genealogy: null,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const web3Context = useWeb3();
-  
+
   const fetchAllData = async () => {
     if (!web3Context?.account) {
-      setError('Wallet not connected');
+      setError("Wallet not connected");
       return;
     }
 
@@ -62,48 +62,59 @@ export const useMLMData = () => {
     setError(null);
 
     try {
-      const { getPersonalDash, getTeamDevDash, getLevelDash, getIncomeDash, getGeneome } = web3Context;
+      const {
+        getPersonalDash,
+        getTeamDevDash,
+        getLevelDash,
+        getIncomeDash,
+        getGeneome,
+      } = web3Context;
 
-      // Execute all the MLM functions in parallel
-      const [personalData, teamData, levelData, incomeData, genealogyData] = await Promise.allSettled([
-        getPersonalDash(),
-        getTeamDevDash(),
-        getLevelDash(),
-        getIncomeDash(),
-        getGeneome()
+      // Execute all the MLM functions with error handling for each
+      const results = await Promise.allSettled([
+        safeCall(getPersonalDash),
+        safeCall(getTeamDevDash),
+        safeCall(getLevelDash),
+        safeCall(getIncomeDash),
+        safeCall(getGeneome),
       ]);
 
+      const [personalData, teamData, levelData, incomeData, genealogyData] =
+        results;
+
       setData({
-        personal: personalData.status === 'fulfilled' ? personalData.value : null,
-        team: teamData.status === 'fulfilled' ? teamData.value : null,
-        levels: levelData.status === 'fulfilled' ? levelData.value?.lvlData || [] : [],
-        income: incomeData.status === 'fulfilled' ? incomeData.value : null,
-        genealogy: genealogyData.status === 'fulfilled' ? genealogyData.value : null
+        personal: getResult(personalData),
+        team: getResult(teamData),
+        levels: getResult(levelData)?.lvlData || [],
+        income: getResult(incomeData),
+        genealogy: getResult(genealogyData),
       });
-
-      // Log any rejected promises
-      [personalData, teamData, levelData, incomeData, genealogyData].forEach((result, index) => {
-        if (result.status === 'rejected') {
-          console.warn(`Data fetch ${index} failed:`, result.reason);
-        }
-      });
-
     } catch (err: any) {
-      console.error('Error fetching MLM data:', err);
-      setError(err.message || 'Failed to fetch data');
+      console.error("Error fetching MLM data:", err);
+      setError(err.message || "Failed to fetch data");
     } finally {
       setLoading(false);
     }
   };
 
+  // Helper function to safely call functions
+  const safeCall = async (fn: Function) => {
+    try {
+      return await fn();
+    } catch (err) {
+      console.error("Error in data fetch:", err);
+      return null;
+    }
+  };
+
+  // Helper to extract result from PromiseSettledResult
+  const getResult = (result: PromiseSettledResult<any>) => {
+    return result.status === "fulfilled" ? result.value : null;
+  };
+
   useEffect(() => {
     if (web3Context?.account && web3Context?.isConnected) {
-      // Fetch data when wallet is connected and ready
-      const timer = setTimeout(() => {
-        fetchAllData();
-      }, 500);
-
-      return () => clearTimeout(timer);
+      fetchAllData();
     }
   }, [web3Context?.account, web3Context?.isConnected]);
 
@@ -111,6 +122,6 @@ export const useMLMData = () => {
     data,
     loading,
     error,
-    refetch: fetchAllData
+    refetch: fetchAllData,
   };
 };

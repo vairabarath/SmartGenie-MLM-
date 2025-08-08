@@ -1,0 +1,281 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      { "name": "_prwall1", "type": "address", "internalType": "address" },
+      { "name": "_prwall2", "type": "address", "internalType": "address" },
+      { "name": "_prwall3", "type": "address", "internalType": "address" },
+      { "name": "_sprwall", "type": "address", "internalType": "address" },
+      { "name": "_reWall", "type": "address", "internalType": "address" },
+      { "name": "_urswall", "type": "address", "internalType": "address" }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "getMoneyForLevelEvent",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "_user",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "_referral",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "_level",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "_time",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false,
+    "signature": "0xce7dc747411ac40191c5335943fcc79d8c2d8c01ca5ae83d9fed160409fa6120"
+  },
+  {
+    "name": "regLevelEvent",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "_user",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "_referrer",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "_time",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false,
+    "signature": "0x788c06d2405ae89dd3f0528d38be7691289474d72176408bc2c2406dc5e342f1"
+  },
+  {
+    "name": "LEVEL_PRICE",
+    "type": "function",
+    "inputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "constant": true,
+    "signature": "0xbb6d887f",
+    "stateMutability": "view"
+  },
+  {
+    "name": "currUserID",
+    "type": "function",
+    "inputs": [],
+    "outputs": [
+      { "name": "", "type": "uint32", "internalType": "uint32" }
+    ],
+    "constant": true,
+    "signature": "0xa4bb170d",
+    "stateMutability": "view"
+  },
+  {
+    "name": "getUserIncomeCount",
+    "type": "function",
+    "inputs": [
+      { "name": "_user", "type": "address", "internalType": "address" },
+      { "name": "_level", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "constant": true,
+    "signature": "0xaa24c5c5",
+    "stateMutability": "view"
+  },
+  {
+    "name": "getUserLevelEligibility",
+    "type": "function",
+    "inputs": [
+      { "name": "_user", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "constant": true,
+    "signature": "0x6158fa00",
+    "stateMutability": "view"
+  },
+  {
+    "name": "getUserReferrals",
+    "type": "function",
+    "inputs": [
+      { "name": "_user", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [
+      { "name": "", "type": "address[]", "internalType": "address[]" }
+    ],
+    "constant": true,
+    "signature": "0x575cea6b",
+    "stateMutability": "view"
+  },
+  {
+    "name": "levelCounter",
+    "type": "function",
+    "inputs": [
+      { "name": "", "type": "uint256", "internalType": "uint256" },
+      { "name": "", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "constant": true,
+    "signature": "0xbbf57068",
+    "stateMutability": "view"
+  },
+  {
+    "name": "levelUpgradePayments",
+    "type": "function",
+    "inputs": [
+      { "name": "", "type": "uint256", "internalType": "uint256" },
+      { "name": "", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "constant": true,
+    "signature": "0x43f6753c",
+    "stateMutability": "view"
+  },
+  {
+    "name": "paymentsLength",
+    "type": "function",
+    "inputs": [
+      { "name": "_user", "type": "address", "internalType": "address" },
+      { "name": "_level", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "constant": true,
+    "signature": "0x109af5c8",
+    "stateMutability": "view"
+  },
+  {
+    "name": "regUser",
+    "type": "function",
+    "inputs": [
+      { "name": "_referrerID", "type": "uint32", "internalType": "uint32" }
+    ],
+    "outputs": [],
+    "payable": true,
+    "signature": "0x3b760c22",
+    "stateMutability": "payable"
+  },
+  {
+    "name": "tusers",
+    "type": "function",
+    "inputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "outputs": [
+      { "name": "earning", "type": "uint256", "internalType": "uint256" },
+      { "name": "id", "type": "uint32", "internalType": "uint32" },
+      { "name": "referrerID", "type": "uint32", "internalType": "uint32" },
+      {
+        "name": "directReferralCount",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "indirectReferralCount",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "indirectReferralLength",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      { "name": "isExist", "type": "bool", "internalType": "bool" }
+    ],
+    "constant": true,
+    "signature": "0x1541d405",
+    "stateMutability": "view"
+  },
+  {
+    "name": "upwall",
+    "type": "function",
+    "inputs": [
+      { "name": "wallAddr", "type": "address", "internalType": "address" },
+      { "name": "index", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [],
+    "signature": "0x36bb11c1",
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "userList",
+    "type": "function",
+    "inputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "constant": true,
+    "signature": "0x9f4216e8",
+    "stateMutability": "view"
+  },
+  {
+    "name": "users",
+    "type": "function",
+    "inputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "outputs": [
+      { "name": "id", "type": "uint32", "internalType": "uint32" },
+      { "name": "referrerID", "type": "uint32", "internalType": "uint32" },
+      { "name": "joined", "type": "uint256", "internalType": "uint256" },
+      { "name": "levelEligibility", "type": "uint8", "internalType": "uint8" },
+      { "name": "isExist", "type": "bool", "internalType": "bool" }
+    ],
+    "constant": true,
+    "signature": "0xa87430ba",
+    "stateMutability": "view"
+  },
+  {
+    "name": "verify",
+    "type": "function",
+    "inputs": [{ "name": "wIndex", "type": "uint8", "internalType": "uint8" }],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "constant": true,
+    "signature": "0xb2225351",
+    "stateMutability": "view"
+  },
+  {
+    "name": "viewUserIndirectReferral",
+    "type": "function",
+    "inputs": [
+      { "name": "_user", "type": "address", "internalType": "address" },
+      { "name": "index", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "constant": true,
+    "signature": "0x9943aa40",
+    "stateMutability": "view"
+  },
+  {
+    "name": "viewUserReferral",
+    "type": "function",
+    "inputs": [
+      { "name": "_user", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [
+      { "name": "", "type": "address[]", "internalType": "address[]" }
+    ],
+    "constant": true,
+    "signature": "0x4a4baa8f",
+    "stateMutability": "view"
+  },
+  {
+    "name": "winwall",
+    "type": "function",
+    "inputs": [{ "name": "wIndex", "type": "uint8", "internalType": "uint8" }],
+    "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+    "signature": "0x04f04e03",
+    "stateMutability": "nonpayable"
+  }
+]

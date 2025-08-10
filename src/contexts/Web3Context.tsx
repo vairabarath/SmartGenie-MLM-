@@ -490,21 +490,30 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    // Clean up listeners before logout
+  const logout = async () => {
     if (walletProvider) {
       try {
-        walletProvider.removeAllListeners?.("accountsChanged");
-        walletProvider.removeAllListeners?.("chainChanged");
+        // Modern, EIP-2255 approach to revoking permissions
+        await walletProvider.request({
+          method: "wallet_revokePermissions",
+          params: [{ eth_accounts: {} }],
+        });
+
+        // older wallets 
+        if (typeof walletProvider.disconnect === 'function') {
+          await walletProvider.disconnect();
+        }
       } catch (error) {
-        console.log("Error cleaning up listeners during logout:", error);
+        console.error("Error during wallet disconnection/revocation:", error);
       }
     }
 
+    // Clear all application state
     setWeb3(null);
     setAccount(null);
     setIsConnected(false);
     setContract(null);
+    setWalletProvider(null); // Also clear the provider
     localStorage.removeItem("currentAccount");
     localStorage.removeItem("selectedWalletRdns");
   };

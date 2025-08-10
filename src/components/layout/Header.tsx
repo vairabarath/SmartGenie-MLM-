@@ -1,13 +1,19 @@
 // src/components/layout/Header.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Settings, Crown, User as UserIcon, LogOut, Wallet, Copy, TrendingUp, RefreshCw } from 'lucide-react';
+import { Bell, Settings, User as UserIcon, LogOut, Wallet, Copy, TrendingUp, RefreshCw, Menu } from 'lucide-react';
 import { useWeb3 } from '../../hooks/useWeb3';
 import { usePrice } from '../../hooks/usePrice';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
+import mlmLogo from '../../assets/mlmLogo.jpeg';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  onToggleSidebar: () => void;
+  sidebarOpen: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { account, logout } = useWeb3();
   const { bnbToUsd, isLoading: priceLoading, refreshPrice } = usePrice();
@@ -47,21 +53,33 @@ const Header: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-800 border-b border-gray-700 px-6 py-4">
+    <div className="bg-gray-800 border-b border-gray-700 px-3 sm:px-6 py-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+        <div className="flex items-center space-x-3 sm:space-x-4">
+          {/* Mobile hamburger menu */}
+          <button
+            onClick={onToggleSidebar}
+            className="lg:hidden p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          
+          <img src={mlmLogo} alt="logo" className='w-8 h-8' />
+          {/* <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
             <Crown className="w-5 h-5" />
+          </div> */}
+          <div className="hidden sm:block">
+            <h1 className="text-lg sm:text-xl font-bold">Nectareous Dashboard</h1>
+            <p className="text-gray-400 text-sm hidden md:block">Welcome to your Dashboard!</p>
           </div>
-          <div>
-            <h1 className="text-xl font-bold">Smart Genie Dashboard</h1>
-            <p className="text-gray-400 text-sm">Welcome to your MLM Dashboard!</p>
+          <div className="sm:hidden">
+            <h1 className="text-sm font-bold">Nectareous Dashboard</h1>
           </div>
         </div>
         
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           {/* BNB Price Indicator */}
-          <div className="flex items-center space-x-2 bg-gray-700/50 rounded-lg px-3 py-2">
+          <div className="hidden sm:flex items-center space-x-2 bg-gray-700/50 rounded-lg px-3 py-2">
             <TrendingUp className="w-4 h-4 text-green-400" />
             <span className="text-sm font-semibold text-green-400">
               {priceLoading ? 'Loading...' : `$${bnbToUsd.toFixed(2)}`}
@@ -76,9 +94,17 @@ const Header: React.FC = () => {
             </button>
           </div>
           
+          {/* Mobile BNB Price - Compact */}
+          <div className="sm:hidden flex items-center space-x-1 bg-gray-700/50 rounded-lg px-2 py-1">
+            <TrendingUp className="w-3 h-3 text-green-400" />
+            <span className="text-xs font-semibold text-green-400">
+              {priceLoading ? '...' : `$${bnbToUsd.toFixed(0)}`}
+            </span>
+          </div>
+          
           {/* Wallet Info */}
           {account && (
-            <div className="flex items-center space-x-2 bg-gray-700/50 rounded-lg px-3 py-2">
+            <div className="hidden md:flex items-center space-x-2 bg-gray-700/50 rounded-lg px-3 py-2">
               <Wallet className="w-4 h-4 text-blue-400" />
               <span className="text-sm font-mono text-gray-300">{formatAddress(account)}</span>
               <button
@@ -91,8 +117,25 @@ const Header: React.FC = () => {
             </div>
           )}
           
-          <Bell className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
-          <Settings className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+          {/* Mobile Wallet Icon */}
+          {account && (
+            <div className="md:hidden">
+              <button
+                onClick={copyAddress}
+                className="p-2 text-blue-400 hover:text-white transition-colors"
+                title={`Copy ${formatAddress(account)}`}
+              >
+                <Wallet className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+          
+          <div className="hidden sm:block">
+            <Bell className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+          </div>
+          <div className="hidden sm:block">
+            <Settings className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+          </div>
           
           {/* User Menu */}
           <div className="relative">

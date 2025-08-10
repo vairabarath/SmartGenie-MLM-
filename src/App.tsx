@@ -3,14 +3,13 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import Personal from "./pages/Personal";
 import LevelStatus from "./pages/LevelStatus";
-import Income from "./pages/Income";
 import GenealogyTree from "./pages/GenealogyTree";
 
 // Authentication components
 import MultiWallet from "./components/auth/MultiWallet";
 import Session from "./components/auth/Session";
 import Register from "./components/auth/Register";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
+// import ProtectedRoute from "./components/auth/ProtectedRoute";
 import WalletConnectionChecker from "./components/auth/WalletConnectionChecker";
 
 const App: React.FC = () => {
@@ -33,15 +32,14 @@ const App: React.FC = () => {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Layout />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         >
           <Route index element={<Personal />} />
           <Route path="personal" element={<Personal />} />
           <Route path="level-status" element={<LevelStatus />} />
-          <Route path="income" element={<Income />} />
           <Route path="genealogy-tree" element={<GenealogyTree />} />
         </Route>
       </Routes>

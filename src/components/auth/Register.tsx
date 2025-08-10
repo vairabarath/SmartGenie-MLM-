@@ -243,26 +243,26 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 p-4 ">
+    <div className="min-h-screen bg-gray-900 p-4">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-gray-800 rounded-xl shadow-2xl border mt-28 border-gray-700 overflow-hidden">
+        <div className="bg-gray-800 rounded-xl shadow-2xl border mt-8 sm:mt-16 lg:mt-28 border-gray-700 overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-center">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 sm:p-6 text-center">
             <div className="flex justify-center mb-4">
-              <UserPlus className="w-12 h-12 text-white" />
+              <UserPlus className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
               User Registration
             </h2>
             <div className="bg-white/10 rounded-lg p-3">
-              <p className="text-sm text-white/80 mb-1">Your Wallet Address:</p>
-              <p className="text-white font-mono text-sm">
+              <p className="text-xs sm:text-sm text-white/80 mb-1">Your Wallet Address:</p>
+              <p className="text-white font-mono text-xs sm:text-sm break-all">
                 {account || "Not connected"}
               </p>
             </div>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {/* Referral URL Input */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -273,13 +273,13 @@ const Register: React.FC = () => {
                   </span>
                 )}
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={referralUrl}
                   onChange={(e) => setReferralUrl(e.target.value)}
                   placeholder="Enter referral URL or it will be auto-filled if detected"
-                  className={`flex-1 px-4 py-3 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  className={`flex-1 px-4 py-3 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
                     referralUrl && getStoredReferralInfo()
                       ? "bg-green-900/20 border-green-500/50"
                       : "bg-gray-700 border-gray-600"
@@ -288,16 +288,21 @@ const Register: React.FC = () => {
                 <button
                   onClick={handleReferralCheck}
                   disabled={isLoading}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  className="px-4 sm:px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px]"
                 >
                   {isLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      {referralUrl && getStoredReferralInfo()
-                        ? "Recheck"
-                        : "Check"}
+                      <ExternalLink className="w-4 h-4 sm:mr-2" />
+                      <span className="hidden sm:inline">
+                        {referralUrl && getStoredReferralInfo()
+                          ? "Recheck"
+                          : "Check"}
+                      </span>
+                      <span className="sm:hidden">
+                        {referralUrl && getStoredReferralInfo() ? "Re" : "Check"}
+                      </span>
                     </>
                   )}
                 </button>

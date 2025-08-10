@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  TrendingUp,
   Users,
   User,
   Calendar,
@@ -8,10 +7,10 @@ import {
   Key,
   Loader2,
   AlertCircle,
-  DollarSign,
 } from "lucide-react";
 import { useMLMData } from "../hooks/useMLMData";
 import BNBValue from "../components/ui/BNBValue";
+import Income from "../components/ui/Income";
 
 const Personal: React.FC = () => {
   const { data, loading, error } = useMLMData();
@@ -60,14 +59,14 @@ const Personal: React.FC = () => {
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-slate-800 rounded-lg p-4 flex items-start space-x-3 hover:bg-slate-750 transition-colors">
             <div className="bg-blue-500/20 p-2 rounded-full">
               <Hash className="text-blue-400" size={18} />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-gray-400 text-sm mb-1">User ID</p>
-              <p className="text-white font-medium">{data.personal.userId}</p>
+              <p className="text-white font-medium break-all">{data.personal.userId}</p>
             </div>
           </div>
 
@@ -75,9 +74,9 @@ const Personal: React.FC = () => {
             <div className="bg-blue-500/20 p-2 rounded-full">
               <Key className="text-blue-400" size={18} />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-gray-400 text-sm mb-1">Referrer ID</p>
-              <p className="text-white font-medium">{data.personal.refId}</p>
+              <p className="text-white font-medium break-all">{data.personal.refId}</p>
             </div>
           </div>
 
@@ -102,30 +101,16 @@ const Personal: React.FC = () => {
           <h3 className="text-xl font-semibold text-white">Team Statistics</h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-slate-800 rounded-lg p-5 hover:bg-slate-750 transition-colors">
             <div className="flex items-center space-x-4">
               <div className="bg-blue-500/20 p-2 rounded-full">
                 <Users className="text-blue-400" size={20} />
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Direct</p>
+                <p className="text-gray-400 text-sm">Total Direct Referrals</p>
                 <p className="text-white text-2xl font-bold">
                   {data.team?.dRefCnt ?? "N/A"}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-slate-800 rounded-lg p-5 hover:bg-slate-750 transition-colors">
-            <div className="flex items-center space-x-4">
-              <div className="bg-purple-500/20 p-2 rounded-full">
-                <TrendingUp className="text-purple-400" size={20} />
-              </div>
-              <div>
-                <p className="text-gray-400 text-sm">Indirect</p>
-                <p className="text-white text-2xl font-bold">
-                  {data.team?.indRefCnt ?? "N/A"}
                 </p>
               </div>
             </div>
@@ -137,7 +122,7 @@ const Personal: React.FC = () => {
                 <Users className="text-green-400" size={20} />
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Total</p>
+                <p className="text-gray-400 text-sm">Team Development Count</p>
                 <p className="text-white text-2xl font-bold">
                   {data.team?.refTotal ?? "N/A"}{" "}
                 </p>
@@ -150,42 +135,21 @@ const Personal: React.FC = () => {
       {/* Quick Earnings Overview */}
       {data.income && (
         <div className="bg-slate-700 rounded-xl p-6 shadow-lg">
-          <div className="flex items-center space-x-3 mb-6">
-            <DollarSign className="text-green-400" size={24} />
-            <h3 className="text-xl font-semibold text-white">
-              Earnings Overview
-            </h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="bg-slate-800 rounded-lg p-4 hover:bg-slate-750 transition-colors">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm mb-1">
-                    Direct Referral Income
-                  </p>
-                  <BNBValue
-                    bnbAmount={data.income.dirRefInc}
-                    bnbClassName="text-green-400 font-semibold"
-                    decimals={4}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="bg-slate-800 rounded-lg p-4 hover:bg-slate-750 transition-colors">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm mb-1">Total Earnings</p>
+                <div className="flex justify-between item-center">
+                  <p className="text-xl font-semibold text-white">Total Earnings</p>
                   <BNBValue
                     bnbAmount={data.income.totalInc}
                     bnbClassName="text-green-400 font-semibold text-lg"
                     decimals={4}
                   />
                 </div>
-              </div>
             </div>
           </div>
         </div>
       )}
+      <Income />
     </div>
   );
 };

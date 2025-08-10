@@ -176,15 +176,15 @@ const MultiWallet: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-8 w-full max-w-md">
-        <div className="text-center mb-8">
+      <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-6 sm:p-8 w-full max-w-md">
+        <div className="text-center mb-6 sm:mb-8">
           <div className="flex justify-center mb-4">
-            <Wallet className="w-16 h-16 text-blue-500" />
+            <Wallet className="w-12 h-12 sm:w-16 sm:h-16 text-blue-500" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
             Connect Your Wallet
           </h1>
-          <p className="text-gray-400">
+          <p className="text-sm sm:text-base text-gray-400">
             Choose a wallet to connect to SmartGenie
           </p>
         </div>

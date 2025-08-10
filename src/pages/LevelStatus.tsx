@@ -34,15 +34,15 @@ const LevelStatus: React.FC = () => {
       <div className="bg-slate-700 rounded-xl p-6 shadow-lg">
         <div className="flex items-center space-x-3 mb-6">
           <TrendingUp className="text-green-400" size={24} />
-          <h2 className="text-white text-xl font-bold">Level Status & Income</h2>
+          <h2 className="text-white text-xl font-bold">Upgrade Status & Income</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {data.levels.map((level) => (
             <div key={level.level} className="bg-slate-800 rounded-lg p-4 hover:bg-slate-750 transition-colors">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-white font-semibold">Level {level.level}</h3>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                <div className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${
                   level.levelStat === 'active'
                     ? 'bg-green-500 text-white'
                     : 'bg-red-500 text-white'
@@ -54,13 +54,12 @@ const LevelStatus: React.FC = () => {
               <div className="mb-1">
                 <BNBValue 
                   bnbAmount={typeof level.levelIncome === 'number' ? level.levelIncome : 0}
-                  bnbClassName="text-green-400 text-lg font-bold"
-                  usdClassName="text-gray-400 text-sm block"
-                  separator=""
+                  bnbClassName="text-green-400 text-base sm:text-lg font-bold"
+                  usdClassName="text-gray-400 text-xs sm:text-sm block"
                 />
               </div>
-              <div className="text-gray-400 text-sm">
-                Income from this level
+              <div className="text-gray-400 text-xs sm:text-sm">
+                Income from this upgrade
               </div>
             </div>
           ))}

@@ -219,25 +219,25 @@ const Session: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-8 w-full max-w-md">
-        <div className="text-center mb-8">
+      <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-6 sm:p-8 w-full max-w-md">
+        <div className="text-center mb-6 sm:mb-8">
           <div className="flex justify-center mb-4">
-            <div className="bg-blue-500/10 p-4 rounded-full">
-              <Wallet className="w-16 h-16 text-blue-500" />
+            <div className="bg-blue-500/10 p-3 sm:p-4 rounded-full">
+              <Wallet className="w-12 h-12 sm:w-16 sm:h-16 text-blue-500" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
             {walletAddress ? "Wallet Detected!" : "Connecting..."}
           </h1>
           {walletAddress && (
             <div className="bg-gray-700/50 rounded-lg p-3 mb-4">
               <p className="text-sm text-gray-300 mb-1">Connected Wallet:</p>
-              <p className="text-white font-mono text-sm">
+              <p className="text-white font-mono text-xs sm:text-sm break-all">
                 {formatAddress(walletAddress)}
               </p>
             </div>
           )}
-          <p className="text-gray-400">
+          <p className="text-sm sm:text-base text-gray-400">
             {walletAddress
               ? "Choose an option to continue"
               : "Please wait while we connect your wallet..."}

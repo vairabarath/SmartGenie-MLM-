@@ -9,7 +9,7 @@ import GenealogyTree from "./pages/GenealogyTree";
 import MultiWallet from "./components/auth/MultiWallet";
 import Session from "./components/auth/Session";
 import Register from "./components/auth/Register";
-// import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import WalletConnectionChecker from "./components/auth/WalletConnectionChecker";
 
 const App: React.FC = () => {
@@ -32,9 +32,9 @@ const App: React.FC = () => {
         <Route
           path="/dashboard"
           element={
-            // <ProtectedRoute>
-            <Layout />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
           }
         >
           <Route index element={<Personal />} />
